@@ -1,4 +1,5 @@
 import {MongoClient, ServerApiVersion} from "mongodb";
+//uri is kept secret from users
 import uri from "./url";
 const client = new MongoClient(uri, 
     {ServerApi: 

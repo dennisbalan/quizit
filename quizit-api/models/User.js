@@ -1,8 +1,8 @@
 import { QuizSchema } from './Quiz';
 const mongoose = require('mongoose');
-//This is the UserSchema for the user
+//This is the UserSchema for the user. It includes boiler plate user information, the quizAttempts made,
 const UserSchema = new mongoose.Schema({
-    name: String,
+    username: String,
     email: String,
     password: String,
     ranking: Number,
