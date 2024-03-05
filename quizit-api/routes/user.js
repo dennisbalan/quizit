@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const { default: db } = require("../db");
 const userModel = mongoose.model('User',UserSchema);
 const router = express.Router();
+const jwt = require("jsonwebtoken");
 const collection = db.collection("User");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
@@ -39,7 +40,7 @@ async function createUser(req,res){
     }
 }
 //This is the get all function for users that returns the json version of all the users available
-async function getUsers(req,res){
+async function getUsers (req,res){
     try{
         const result = await collection.findOne({}).toArray();
         res.send(result).status(200);
@@ -60,6 +61,9 @@ async function loginUser(req,res){
         //check if password is true
         bcrypt.compare(req.body.password,dbPassword,function(err,result){
             //true
+            //create jwt token from 
+            const token = jwt.sign({userID: query._id}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '8h'});
+            res.status(200).json({token});
         })
         //Login failed, send 401 code
         bcrypt.compare(req.body.password,dbPassword,function(err,result){
