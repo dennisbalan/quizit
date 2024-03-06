@@ -1,4 +1,4 @@
-import { AnswerSchema } from './Answer';
+const AnswerScehma = require('./Answer');
 
 const mongoose = require('mongoose');
 const QuestionSchema = new mongoose.Schema({
@@ -7,8 +7,8 @@ const QuestionSchema = new mongoose.Schema({
     picture_enabled: Boolean,
     picture_link: String,
     answers: [{
-        description: Text,
+        description: String,
         correct: Boolean
     }]
 })
-export {default as QuestionSchema}
+module.exports = {QuestionSchema};

@@ -1,6 +1,8 @@
-import {MongoClient, ServerApiVersion} from "mongodb";
+//import {MongoClient, ServerApiVersion} from "mongodb";
+const MongoClient = require("mongodb").MongoClient;
+const ServerApiVersion = require("mongodb").ServerApiVersion;
 //uri is kept secret from users
-import uri from "./url";
+const uri = require('./url.js');
 const client = new MongoClient(uri, 
     {ServerApi: 
         {
@@ -16,4 +18,4 @@ try{
     console.log(error);
 }
 let db = client.connect("Cluster0");
-export default db;
+module.exports = {db}

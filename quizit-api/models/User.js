@@ -1,4 +1,5 @@
-import { QuizSchema } from './Quiz';
+const AttemptSchema = require('./Attempt');
+const QuizSchema = require('./Quiz');
 const mongoose = require('mongoose');
 //This is the UserSchema for the user. It includes boiler plate user information, the quizAttempts made,
 const UserSchema = new mongoose.Schema({
@@ -7,10 +8,8 @@ const UserSchema = new mongoose.Schema({
     password: String,
     ranking: Number,
     quizesTaken:[{
-        quizId: String,
-        score: Number,
-        dateTaken: String,
-        attempts: Number
+        attempt: AttemptSchema,
+        number_of_attempts: Number
     }
     ],
     quizesCreated:[{
@@ -19,4 +18,4 @@ const UserSchema = new mongoose.Schema({
     darkMode: Boolean,
 
 })
-export {default as UserSchema}
+module.exports = {UserSchema};

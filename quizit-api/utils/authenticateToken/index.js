@@ -18,4 +18,4 @@ function authenticateToken(req,res,next){
         next() 
     })
 }
-export default authenticateToken;
+module.exports = {authenticateToken};

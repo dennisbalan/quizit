@@ -74,8 +74,19 @@ async function loginUser(req,res){
         res.status(500).send(error);
     }
 }
+//function for getting a specific user's infromation from the mongodb database
+async function getUser(req,res){
+    try{
+        const query = await collection.findOne(`_id:${req.body._id}`);
+        res.status(200).json({query});
+    }
+    catch(error){
+        res.status(500).send(error);
+    }
+}
 router.get('/',getUsers);
 router.get('/:userId',getUser);
 router.post('/signup',createUser);
 router.post('/login',loginUser);
 router.put('/:userId',updateUser);
+router.delete('/users/:userId',deleteUser);

@@ -3,4 +3,4 @@ const AnswerSchema = new mongoose.Schema({
     text: String,
     correct: Boolean
 })
-export {default as AnswerSchema}
+module.exports = {AnswerSchema};
