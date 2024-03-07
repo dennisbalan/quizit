@@ -6,6 +6,7 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 const collection = db.collection("User");
 const bcrypt = require("bcrypt");
+const { ObjectId, FindCursor } = require("mongodb");
 const saltRounds = 10;
 //These are the user Route functions
 //this is the post function for users that is the default. The new user is inserted into the db
@@ -84,9 +85,51 @@ async function getUser(req,res){
         res.status(500).send(error);
     }
 }
+//function for updating user profile
+async function updateUserProfile(req,res){
+    try{
+        //const user = await collection.findOne(`_id:${req.body._id}`);
+        //gather the body fields into username and email variables for update
+        const {username} = req.body.username;
+        const {email} = req.body.email;
+        //check to see if updated email exists in database. If it exists, return 409 code
+        const emailLookup = await collection.findOne(`email:${req.body.email}`);
+        if(emailLookup !== null){
+            res.status(409).send("User already exists");
+            return
+        }
+        //update the object with the new info
+        const query = {_id : req.body._id };
+        const update_profile_stuff = {
+            $set:{
+                username: username,
+                email: email,
+            }
+        }
+        let result = await collection.updateOne(query,update_profile_stuff);
+        res.send(result).status(200);
+    }
+    catch(error){
+        res.status(500).send(error);
+    }
+}
+//delete users with this function
+async function deleteUser(req,res){
+    try{
+        const {id} = req.params._id;
+        let result = await collection.deleteOne(`_id:${id}`);
+        res.send(result).staus(200);
+    }catch(error){
+        res.status(500).send(error);
+    }
+    
+    
+}
 router.get('/',getUsers);
 router.get('/:userId',getUser);
 router.post('/signup',createUser);
 router.post('/login',loginUser);
-router.put('/:userId',updateUser);
+router.put('/:userId',updateUserProfile);
 router.delete('/users/:userId',deleteUser);
+
+module.exports = {router};
