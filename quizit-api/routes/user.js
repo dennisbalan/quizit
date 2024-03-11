@@ -1,20 +1,30 @@
 const express = require("express");
 const mongoose = require('mongoose');
 const { default: db } = require("../db");
+const UserSchema = require("../models/User");
 const userModel = mongoose.model('User',UserSchema);
 const router = express.Router();
 const jwt = require("jsonwebtoken");
-const collection = db.collection("User");
+let collection;
+(async() => {
+    collection = await db.collection("User");
+})
 const bcrypt = require("bcrypt");
 const { ObjectId, FindCursor } = require("mongodb");
 const saltRounds = 10;
 //These are the user Route functions
 //this is the post function for users that is the default. The new user is inserted into the db
 async function createUser(req,res){
+    console.log("recieved");
     try{
+        console.log("try");
+        console.log(req.body);
+        console.log(collection);
         //check to see if email exists. If it does exist, send 409 code and termninated
-        const emailLookup = await collection.findOne(`email:${req.body.email}`);
-        if(emailLookup !== null){
+        console.log(collection);
+        let emailLookup = await collection.findOne(`email:${req.body.email}`);
+        console.log(emailLookup);
+        if(emailLookup !== undefined){
             res.status(409).send("User already exists");
             return
         }
@@ -24,6 +34,7 @@ async function createUser(req,res){
                 req.body.password = hash;
             })
         })
+        console.log(req.body.password);
         //create new user using the UserSchema schema
         const newUser =  new userModel({
             username: req.body.username,
@@ -34,7 +45,8 @@ async function createUser(req,res){
         })
         //insert result into database and send status code of 200 back
         const result = await collection.insertOne(newUser);
-        res.send(result).status(200);
+        console.log(result);
+        res.send(result).status(204);
     }
     catch(error){
         res.status(500).send(error);
