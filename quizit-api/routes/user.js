@@ -1,40 +1,51 @@
 const express = require("express");
 const mongoose = require('mongoose');
-const { default: db } = require("../db");
+let collection;
+let db = require("../db/index").db.then(function(db){
+    collection = db.collection("User");
+    console.log(collection);
+}); 
 const UserSchema = require("../models/User");
 const userModel = mongoose.model('User',UserSchema);
 const router = express.Router();
 const jwt = require("jsonwebtoken");
-let collection;
-(async() => {
-    collection = await db.collection("User");
-})
+
+/*(async() => {
+    if(db != undefined){
+        
+    }
+})*/
 const bcrypt = require("bcrypt");
 const { ObjectId, FindCursor } = require("mongodb");
 const saltRounds = 10;
+//console.log(db);
+//console.log(collection);
 //These are the user Route functions
 //this is the post function for users that is the default. The new user is inserted into the db
 async function createUser(req,res){
-    console.log("recieved");
+    console.log("received");
     try{
+        //console.log(db);
+        //console.log(collection);
         console.log("try");
         console.log(req.body);
-        console.log(collection);
         //check to see if email exists. If it does exist, send 409 code and termninated
-        console.log(collection);
-        let emailLookup = await collection.findOne(`email:${req.body.email}`);
+        let emailLookup = await collection.findOne({email: req.body.email});
         console.log(emailLookup);
-        if(emailLookup !== undefined){
+        if(emailLookup !== null){
+            console.log(emailLookup);
             res.status(409).send("User already exists");
+            console.log("user exists");
             return
         }
         //hash the password using bcrypt for security purposes
+        let hashed;
         bcrypt.genSalt(saltRounds,function(err,salt){
             bcrypt.hash(req.body.password,salt,function(err,hash){
-                req.body.password = hash;
+                hashed = hash;
             })
         })
-        console.log(req.body.password);
+        console.log(hashed);
         //create new user using the UserSchema schema
         const newUser =  new userModel({
             username: req.body.username,
@@ -43,6 +54,8 @@ async function createUser(req,res){
             quizesTaken: [],
             ranking: 0
         })
+        console.log(newUser);
+        console.log(userModel);
         //insert result into database and send status code of 200 back
         const result = await collection.insertOne(newUser);
         console.log(result);

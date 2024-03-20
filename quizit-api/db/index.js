@@ -13,18 +13,27 @@ const client = new MongoClient(uri,
     }
 );
 let db;
+console.log(db);
 async function run() {
     try{
         await client.connect();
-        await client.db("admin").command({ ping: 1 });
-        console.log("Pinged your deployment. You successfully connected to MongoDB!");
-        db = client.db("test");
-        console.log(client);
-        console.log(db);
+        await client.db("Quizit").command({ ping: 1 });
+        console.log("Pinged your deployment. You successfully connected to MongoDB!");  
+        //console.log(client);
+        //console.log(db);
+        db = client.db("Quizit");
+        let f = await db.listCollections().toArray();
+        //console.log(f);
+       
     }catch(error){
         console.log(error);
     }
+    return db;
 };
-run();
-console.log(db);
-module.exports = {db}
+
+
+//console.log(client.db.collection("users"));
+module.exports.db = new Promise(function(resolve, reject){
+    db = run();
+    resolve(db);
+})

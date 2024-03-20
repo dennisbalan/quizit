@@ -14,4 +14,4 @@ const QuizSchema = new mongoose.Schema({
     published: Boolean,
     key: String
 })
-export {default as QuizSchema}
+module.exports = {QuizSchema}
