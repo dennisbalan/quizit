@@ -2,7 +2,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 const users = require('./routes/user.js').router;
 //const { UserSchema } = require('./models/User');
-const uri = require("./db/url.js");
 const { QuestionSchema } = require('./models/Question');
 const app = express ();
 app.use(express.json());
@@ -15,7 +14,6 @@ app.get('/status', (req,res) => {
 })
 
 const questionModel = mongoose.model('Question',QuestionSchema);
-console.log(uri);
 app.use('/user',users);
 //app.get('/quiz/:quizId',getQuiz);
 //app.post('/quiz',createQuiz);
