@@ -147,9 +147,9 @@ async function updateUserProfile(req,res){
 //delete users with this function
 async function deleteUser(req,res){
     try{
-        const id = req.params._id;
-        const query = {_id: new mongoose.Types.ObjectId(id)}
-        let result = await collection.deleteOne(query);
+        const id = req.params.userId;
+        const query = new mongoose.Types.ObjectId(id)
+        let result = await collection.deleteOne({_id: query});
         res.send(result).status(200);
     }catch(error){
         res.status(500).send(error);
