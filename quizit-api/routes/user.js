@@ -18,8 +18,6 @@ const saltRounds = 10;
 async function createUser(req,res){
     console.log("received");
     try{
-        console.log("try");
-        console.log(req.body);
         //check to see if email exists. If it does exist, send 409 code and termninated
         let emailLookup = await collection.findOne({email: req.body.email});
         if(emailLookup !== null){
@@ -36,7 +34,6 @@ async function createUser(req,res){
             })
         })*/
         hashed = await bcrypt.hash(req.body.password,saltRounds);
-        console.log(hashed);
         //create new user using the UserSchema schema
         const newUser =  {
             username: req.body.username,
@@ -58,10 +55,8 @@ async function createUser(req,res){
 }
 //This is the get all function for users that returns the json version of all the users available
 async function getUsers (req,res){
-    console.log("getUsers");
     try{
         const result = await collection.find().toArray();
-        console.log(result);
         res.send(result).status(200);
     }
     catch(error){
@@ -72,7 +67,7 @@ async function getUsers (req,res){
 async function loginUser(req,res){
     try{
         //look up via email
-        const query = await collection.findOne(`email:${req.body.email}`);
+        const query = await collection.findOne({email:req.body.email});
         if(query === null){
             res.status(401).send("Invalid username");
         }
@@ -81,15 +76,22 @@ async function loginUser(req,res){
         bcrypt.compare(req.body.password,dbPassword,function(err,result){
             //true
             //create jwt token from 
-            const token = jwt.sign({userID: query._id}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '8h'});
-            res.status(200).json({token});
-        })
-        //Login failed, send 401 code
-        bcrypt.compare(req.body.password,dbPassword,function(err,result){
-            //false
-            res.status(401).send("wrong password. Please try again");
+            console.log(result);
+            if(err){
+                console.log(err);
+                res.status(500).send(err);
+            }
+            if(result){
+                const token = jwt.sign({userID: query._id}, `${process.env.ACCESS_TOKEN_SECRET}`, {expiresIn: '8h'});
+                res.status(200).json(token);
+            }
+            else{
+                res.status(401).send("wrong password. Please try again");
+            }
+            
         })
     }catch(error){
+        console.log(error);
         res.status(500).send(error);
     }
 }
@@ -97,10 +99,8 @@ async function loginUser(req,res){
 async function getUser(req,res){
     console.log("get");
     try{
-        console.log(req.params.userId);
         let lookup = {_id: new ObjectId(req.params.userId)};
         const query = await collection.findOne(lookup);
-        console.log(query);
         res.status(200).json({query});
     }
     catch(error){
@@ -111,7 +111,6 @@ async function getUser(req,res){
 //function for updating user profile
 async function updateUserProfile(req,res){
     try{
-        console.log(req.body);
         //const user = await collection.findOne(`_id:${req.body._id}`);
         //gather the body fields into username and email variables for update
         //console.log(req.body);
@@ -123,12 +122,9 @@ async function updateUserProfile(req,res){
             res.status(409).send("User already exists");
             return
         }
-        console.log(username);
-        console.log(email);
         //console.log(emailLookup);
         //update the object with the new info
         const query = {_id : new mongoose.Types.ObjectId(req.params.userId) };
-        console.log(query);
         const update_profile_stuff = {
             $set:{
                 "username" : username,
@@ -136,7 +132,6 @@ async function updateUserProfile(req,res){
             }
         }
         let result = await collection.updateOne(query,update_profile_stuff);
-        console.log(result);
         res.send(result).status(200);
     }
     catch(error){
