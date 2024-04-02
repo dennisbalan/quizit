@@ -50,6 +50,7 @@ async function createUser(req,res){
         res.send(result).status(204);
     }
     catch(error){
+        console.log(error);
         res.status(500).send(error);
     }
 }
