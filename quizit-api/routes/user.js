@@ -149,9 +149,7 @@ async function deleteUser(req,res){
         res.send(result).status(200);
     }catch(error){
         res.status(500).send(error);
-    }
-    
-    
+    }    
 }
 router.get('/',getUsers);
 router.get('/:userId',getUser);

@@ -35,9 +35,46 @@ async function publishQuiz(req,res){
             let result = collection.updateOne(id_lookup,publish_object);
             res.status(200).sendd(result);
         }
-        res.status(409).send("quiz does not exist");
-
+        else{
+            res.status(409).send("quiz does not exist");
+        }
     }catch(error){
+        console.log(error);
+        res.status(500).send(error);
+    }
+}
+async function addQuestion(req,res){
+    try{
+        const lookup = collection.findOne({_id: new mongoose.Types.ObjectId(req.params.id)});
+        if(lookup !== null){
+            const id_lookup = {_id: new mongoose.Types.ObjectId(req.params._id)};
+            if(lookup.hasOwnProperty("quiz_questions") === true){
+                const questions = lookup["quiz_questions"];
+                questions.push(req.body.questions);
+                const updated_questions = {
+                    $set: {
+                        "questions": questions
+                    }
+                }
+                const result = collection.updateOne(id_lookup,updated_questions);
+                res.status(200).send(result);
+            }
+            else{
+                const questions = req.body.questions;
+                const updated_questions = {
+                    $set: {
+                        "questions": questions
+                    }
+                }
+                const result = collection.updateOne(id_lookup,updated_questions);
+                res.status(200).send(result);
+            }
+        }
+        else{
+            res.status(409).send("quiz does not exist");
+        }
+    }
+    catch(error){
         console.log(error);
         res.status(500).send(error);
     }
